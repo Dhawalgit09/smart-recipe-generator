@@ -1,6 +1,25 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Recipe, RecipeGenerationRequest } from "../types/recipe";
 
+/**
+ * Define types for Gemini API response
+ */
+interface GeminiIngredient {
+  ingredient: string;
+  amount: number;
+  unit: string;
+  notes?: string;
+  isOptional?: boolean;
+}
+
+interface GeminiRecipe {
+  name: string;
+  description: string;
+  ingredients: GeminiIngredient[];
+  instructions: string[];
+  [key: string]: unknown;
+}
+
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -120,15 +139,17 @@ export class GeminiRecipeService {
     }
   }
 
+
+
   /**
    * Convert Gemini response to Recipe format
    */
-  private static convertToRecipeFormat(geminiRecipes: any[], request: RecipeGenerationRequest): Recipe[] {
-    return geminiRecipes.map((geminiRecipe: any, index: number) => ({
+  private static convertToRecipeFormat(geminiRecipes: GeminiRecipe[], request: RecipeGenerationRequest): Recipe[] {
+    return geminiRecipes.map((geminiRecipe: GeminiRecipe, index: number) => ({
       id: `gemini-${Date.now()}-${index}`,
       name: geminiRecipe.name || `AI Generated Recipe ${index + 1}`,
       description: geminiRecipe.description || "Delicious AI-generated recipe",
-      ingredients: geminiRecipe.ingredients?.map((ing: any) => ({
+      ingredients: geminiRecipe.ingredients?.map((ing: GeminiIngredient) => ({
         ingredient: ing.ingredient || "ingredient",
         amount: ing.amount || 1,
         unit: ing.unit || "piece",
@@ -142,12 +163,12 @@ export class GeminiRecipeService {
         tips: undefined
       })) || [],
       nutritionalInfo: {
-        calories: geminiRecipe.nutrition?.calories || 300,
-        protein: geminiRecipe.nutrition?.protein || 20,
-        carbs: geminiRecipe.nutrition?.carbs || 25,
-        fat: geminiRecipe.nutrition?.fat || 15,
-        fiber: geminiRecipe.nutrition?.fiber || 5,
-        sugar: geminiRecipe.nutrition?.sugar || 3
+        calories: (geminiRecipe.nutrition as { calories?: number })?.calories || 300,
+        protein: (geminiRecipe.nutrition as { protein?: number })?.protein || 20,
+        carbs: (geminiRecipe.nutrition as { carbs?: number })?.carbs || 25,
+        fat: (geminiRecipe.nutrition as { fat?: number })?.fat || 15,
+        fiber: (geminiRecipe.nutrition as { fiber?: number })?.fiber || 5,
+        sugar: (geminiRecipe.nutrition as { sugar?: number })?.sugar || 3
       },
       cookingTime: geminiRecipe.cookingTime || 30,
       difficulty: (geminiRecipe.difficulty || "Easy").toLowerCase() as 'easy' | 'medium' | 'hard',
@@ -224,4 +245,4 @@ export class GeminiRecipeService {
       }
     ];
   }
-} 
+}

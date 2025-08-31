@@ -64,7 +64,8 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
   });
 
   const exactMatches = ingredientMatches.filter(m => m.matchType === 'exact');
-  const missingIngredients = recipe.ingredients.filter(ing => 
+  // Get missing ingredients for display purposes
+  const missingIngredientsForDisplay = recipe.ingredients.filter(ing => 
     !userIngredients.some(userIng => 
       userIng.toLowerCase().includes(ing.ingredient.toLowerCase()) ||
       ing.ingredient.toLowerCase().includes(userIng.toLowerCase())
@@ -299,4 +300,4 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
       )}
     </div>
   );
-} 
+}

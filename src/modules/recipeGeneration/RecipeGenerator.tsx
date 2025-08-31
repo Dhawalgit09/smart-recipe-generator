@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { Recipe, RecipeMatch, IngredientMatch } from '../../types/recipe';
+import { Recipe } from '../../types/recipe';
 import { useRecipeMatching } from '../../hooks/useRecipeMatching';
 import RecipeCard from './RecipeCard';
 import RecipeFilters from './RecipeFilters';
 import RecipeDetails from './RecipeDetails';
-import { RecipeMatchingAlgorithm } from '../../utils/recipeMatchingAlgorithm';
 
 interface RecipeGeneratorProps {
   userIngredients: string[];
@@ -231,4 +230,4 @@ export default function RecipeGenerator({
       )}
     </div>
   );
-} 
+}

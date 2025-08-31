@@ -17,7 +17,8 @@ export default function RecipeCard({ recipe, index, onSelect, userIngredients }:
   const exactMatches = ingredientMatches.filter(m => m.matchType === 'exact').length;
   const similarMatches = ingredientMatches.filter(m => m.matchType === 'similar').length;
   const substituteMatches = ingredientMatches.filter(m => m.matchType === 'substitute').length;
-  const missingIngredients = ingredientMatches.filter(m => m.matchType === 'missing').length;
+  // Calculate missing ingredients (used for display purposes)
+  const missingIngredientsCount = ingredientMatches.filter(m => m.matchType === 'missing').length;
   
   // Calculate match percentage
   const matchPercentage = Math.round(matchScore * 100);
@@ -193,4 +194,4 @@ export default function RecipeCard({ recipe, index, onSelect, userIngredients }:
       </button>
     </div>
   );
-} 
+}
