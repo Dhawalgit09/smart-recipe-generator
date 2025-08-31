@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import RecipeFeedback from '@/models/RecipeFeedback';
 import Recipe from '@/models/Recipe';
 import User from '@/models/User';
+import mongoose from 'mongoose';
 
 export async function POST(request: NextRequest) {
   try {
@@ -194,7 +195,10 @@ async function updateUserPreferences(userId: string, recipeId: string, rating: n
     if (isFavorite && !user.favoriteRecipes.includes(recipe._id)) {
       user.favoriteRecipes.push(recipe._id);
     } else if (!isFavorite) {
-      user.favoriteRecipes = user.favoriteRecipes.filter(id => !id.equals(recipe._id));
+      user.favoriteRecipes = user.favoriteRecipes.filter(
+        (id: mongoose.Types.ObjectId) => !id.equals(recipe._id as mongoose.Types.ObjectId)
+      );
+      
     }
 
     // Update preferences based on high-rated recipes
