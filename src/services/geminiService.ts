@@ -17,6 +17,23 @@ interface GeminiRecipe {
   description: string;
   ingredients: GeminiIngredient[];
   instructions: string[];
+  nutrition?: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fiber?: number;
+    sugar?: number;
+  };
+  cookingTime?: number;
+  difficulty?: string;
+  cuisineType?: string;
+  mealType?: string;
+  tags?: string[];
+  rating?: number;
+  servings?: number;
+  prepTime?: number;
+  totalTime?: number;
   [key: string]: unknown;
 }
 
@@ -110,7 +127,6 @@ export class GeminiRecipeService {
       // Simple JSON parsing with fallback
       let parsed;
       try {
-        // Clean the response
         const cleanedText = text
           .replace(/```json/g, '')
           .replace(/```/g, '')
@@ -120,8 +136,6 @@ export class GeminiRecipeService {
       } catch (error) {
         console.error("❌ JSON Parse Error:", error);
         console.log("Raw Output:", text);
-        
-        // Return fallback recipes if parsing fails
         return this.getFallbackRecipes();
       }
       
@@ -130,7 +144,6 @@ export class GeminiRecipeService {
         return this.getFallbackRecipes();
       }
       
-      // Convert to Recipe format
       return this.convertToRecipeFormat(parsed.recipes, request);
       
     } catch (error) {
@@ -138,8 +151,6 @@ export class GeminiRecipeService {
       return this.getFallbackRecipes();
     }
   }
-
-
 
   /**
    * Convert Gemini response to Recipe format
@@ -163,12 +174,12 @@ export class GeminiRecipeService {
         tips: undefined
       })) || [],
       nutritionalInfo: {
-        calories: (geminiRecipe.nutrition as { calories?: number })?.calories || 300,
-        protein: (geminiRecipe.nutrition as { protein?: number })?.protein || 20,
-        carbs: (geminiRecipe.nutrition as { carbs?: number })?.carbs || 25,
-        fat: (geminiRecipe.nutrition as { fat?: number })?.fat || 15,
-        fiber: (geminiRecipe.nutrition as { fiber?: number })?.fiber || 5,
-        sugar: (geminiRecipe.nutrition as { sugar?: number })?.sugar || 3
+        calories: geminiRecipe.nutrition?.calories || 300,
+        protein: geminiRecipe.nutrition?.protein || 20,
+        carbs: geminiRecipe.nutrition?.carbs || 25,
+        fat: geminiRecipe.nutrition?.fat || 15,
+        fiber: geminiRecipe.nutrition?.fiber || 5,
+        sugar: geminiRecipe.nutrition?.sugar || 3
       },
       cookingTime: geminiRecipe.cookingTime || 30,
       difficulty: (geminiRecipe.difficulty || "Easy").toLowerCase() as 'easy' | 'medium' | 'hard',

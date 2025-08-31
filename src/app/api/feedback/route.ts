@@ -115,8 +115,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let query: any = { userId };
-
+    // Fix: use const and proper type instead of any
+    const query: Record<string, string> = { userId };
     if (recipeId) {
       query.recipeId = recipeId;
     }

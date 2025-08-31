@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Recipe, IngredientMatch } from '../../types/recipe';
+import { Recipe } from '../../types/recipe';
 import RecipeFeedback from '../../components/RecipeFeedback';
 
 interface RecipeDetailsProps {
@@ -11,9 +11,21 @@ interface RecipeDetailsProps {
   userId?: string;
 }
 
+interface RecipeFeedbackData {
+  rating: number;
+  review?: string;
+  isFavorite: boolean;
+  cookingNotes?: string;
+  difficultyRating?: number;
+  tasteRating?: number;
+  presentationRating?: number;
+  wouldCookAgain?: boolean;
+  tags?: string[];
+}
+
 export default function RecipeDetails({ recipe, userIngredients, onClose, userId }: RecipeDetailsProps) {
   const [showFeedback, setShowFeedback] = useState(false);
-  const [userFeedback, setUserFeedback] = useState<any>(null);
+  const [userFeedback, setUserFeedback] = useState<RecipeFeedbackData | null>(null);
   const [isLoadingFeedback, setIsLoadingFeedback] = useState(false);
 
   // Check for existing user feedback
@@ -28,12 +40,15 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
     try {
       const response = await fetch(`/api/feedback?userId=${userId}&recipeId=${recipe.id}`);
       const data = await response.json();
-      
+
       if (data.success && data.feedback.length > 0) {
         setUserFeedback(data.feedback[0]);
+      } else {
+        setUserFeedback(null);
       }
     } catch (error) {
       console.error('Error checking user feedback:', error);
+      setUserFeedback(null);
     } finally {
       setIsLoadingFeedback(false);
     }
@@ -41,11 +56,11 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
 
   // Group ingredient matches by type for better display
   const ingredientMatches = userIngredients.map(userIngredient => {
-    const recipeIngredient = recipe.ingredients.find(ing => 
+    const recipeIngredient = recipe.ingredients.find(ing =>
       ing.ingredient.toLowerCase().includes(userIngredient.toLowerCase()) ||
       userIngredient.toLowerCase().includes(ing.ingredient.toLowerCase())
     );
-    
+
     if (recipeIngredient) {
       return {
         userIngredient,
@@ -54,7 +69,7 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
         confidence: 1.0
       };
     }
-    
+
     return {
       userIngredient,
       recipeIngredient: 'Not found',
@@ -63,11 +78,12 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
     };
   });
 
-  // Count of exact matches (used for display purposes)
+  // Count of exact matches
   const exactMatchesCount = ingredientMatches.filter(m => m.matchType === 'exact').length;
-  // Get missing ingredients for display purposes
-  const missingIngredientsForDisplay = recipe.ingredients.filter(ing => 
-    !userIngredients.some(userIng => 
+
+  // Missing ingredients for display
+  const missingIngredientsForDisplay = recipe.ingredients.filter(ing =>
+    !userIngredients.some(userIng =>
       userIng.toLowerCase().includes(ing.ingredient.toLowerCase()) ||
       ing.ingredient.toLowerCase().includes(userIng.toLowerCase())
     )
@@ -80,14 +96,14 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-[#1a1a2e] rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[#2d2d5a]">
-        
+
         {/* Header */}
         <div className="sticky top-0 bg-[#1a1a2e] p-6 border-b border-[#2d2d5a] rounded-t-3xl">
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <h2 className="text-3xl font-bold text-white mb-2">{recipe.name}</h2>
               <p className="text-gray-300 text-lg mb-4">{recipe.description}</p>
-              
+
               {/* Rating Display */}
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center space-x-1">
@@ -95,7 +111,7 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
                   <span className="text-white font-bold text-lg">{recipe.rating}</span>
                   <span className="text-gray-400">({recipe.totalRatings} ratings)</span>
                 </div>
-                
+
                 {/* User's Rating */}
                 {userFeedback && (
                   <div className="flex items-center space-x-1">
@@ -109,7 +125,7 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
                 )}
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               {/* Feedback Button */}
               {userId && (
@@ -120,7 +136,7 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
                   {userFeedback ? 'Update Rating' : 'Rate Recipe'}
                 </button>
               )}
-              
+
               <button
                 onClick={onClose}
                 className="w-10 h-10 bg-gray-600 hover:bg-gray-700 rounded-full flex items-center justify-center text-white transition-all duration-300"
@@ -129,7 +145,7 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
               </button>
             </div>
           </div>
-          
+
           {/* Recipe Meta */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
             <div className="text-center">
@@ -157,24 +173,20 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
 
         {/* Content */}
         <div className="p-6 space-y-8">
-          
+
           {/* Ingredient Analysis */}
           <div className="bg-[#0f0f23] rounded-2xl p-6 border border-[#2d2d5a]">
             <h3 className="text-xl font-bold text-white mb-4">📋 Ingredient Analysis</h3>
-            
+
             {/* Your Ingredients */}
             <div className="mb-6">
               <h4 className="text-lg font-semibold text-white mb-3">Your Ingredients ({userIngredients.length})</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {ingredientMatches.map((match, index) => (
                   <div key={index} className="flex items-center space-x-2">
-                    <span className={`w-3 h-3 rounded-full ${
-                      match.matchType === 'exact' ? 'bg-green-500' : 'bg-red-500'
-                    }`}></span>
+                    <span className={`w-3 h-3 rounded-full ${match.matchType === 'exact' ? 'bg-green-500' : 'bg-red-500'}`}></span>
                     <span className="text-gray-300">{match.userIngredient}</span>
-                    <span className="text-gray-500 text-sm">
-                      {match.matchType === 'exact' ? '✓' : '✗'}
-                    </span>
+                    <span className="text-gray-500 text-sm">{match.matchType === 'exact' ? '✓' : '✗'}</span>
                   </div>
                 ))}
               </div>
@@ -188,21 +200,17 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
                   <div key={index} className="flex items-center justify-between p-3 bg-[#1a1a2e] rounded-lg">
                     <div className="flex items-center space-x-3">
                       <span className={`w-3 h-3 rounded-full ${
-                        userIngredients.some(userIng => 
+                        userIngredients.some(userIng =>
                           userIng.toLowerCase().includes(ingredient.ingredient.toLowerCase()) ||
                           ingredient.ingredient.toLowerCase().includes(userIng.toLowerCase())
                         ) ? 'bg-green-500' : 'bg-red-500'
                       }`}></span>
                       <span className="text-white font-medium">{ingredient.ingredient}</span>
-                      {ingredient.isOptional && (
-                        <span className="text-purple-400 text-sm">(Optional)</span>
-                      )}
+                      {ingredient.isOptional && <span className="text-purple-400 text-sm">(Optional)</span>}
                     </div>
                     <div className="text-gray-300 text-sm">
                       {ingredient.amount} {ingredient.unit}
-                      {ingredient.notes && (
-                        <span className="text-gray-500 ml-2">- {ingredient.notes}</span>
-                      )}
+                      {ingredient.notes && <span className="text-gray-500 ml-2">- {ingredient.notes}</span>}
                     </div>
                   </div>
                 ))}
@@ -221,12 +229,8 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
                   </div>
                   <div className="flex-1">
                     <p className="text-white leading-relaxed">{step.instruction}</p>
-                    {step.timeMinutes && (
-                      <p className="text-gray-400 text-sm mt-1">⏱️ {step.timeMinutes} minutes</p>
-                    )}
-                    {step.tips && (
-                      <p className="text-purple-300 text-sm mt-1">💡 {step.tips}</p>
-                    )}
+                    {step.timeMinutes && <p className="text-gray-400 text-sm mt-1">⏱️ {step.timeMinutes} minutes</p>}
+                    {step.tips && <p className="text-purple-300 text-sm mt-1">💡 {step.tips}</p>}
                   </div>
                 </div>
               ))}
@@ -254,7 +258,7 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
                 <div className="text-gray-400 text-sm">Fat</div>
               </div>
             </div>
-            
+
             {/* Additional Nutritional Info */}
             {(recipe.nutritionalInfo.fiber || recipe.nutritionalInfo.sugar) && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-[#2d2d5a]">
@@ -280,9 +284,7 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
               <h3 className="text-xl font-bold text-white mb-4">🏷️ Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {recipe.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm">
-                    {tag}
-                  </span>
+                  <span key={index} className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm">{tag}</span>
                 ))}
               </div>
             </div>

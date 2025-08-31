@@ -185,7 +185,7 @@ export default function ImageRecipeDetails({ recipe, onClose }: ImageRecipeDetai
               <li>• Read through all instructions before starting</li>
               <li>• Prepare all ingredients before beginning to cook</li>
               <li>• Adjust seasoning to your taste preferences</li>
-              <li>• Don't be afraid to experiment with the recipe</li>
+              <li>• Don&apos;t be afraid to experiment with the recipe</li>
             </ul>
           </div>
         </div>

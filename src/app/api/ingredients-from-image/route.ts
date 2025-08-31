@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Clean and validate ingredients
-      const cleanIngredients = parsed.ingredients
-        .filter((ingredient: any) => 
+      const cleanIngredients = (parsed.ingredients as string[])
+        .filter((ingredient: string) => 
           typeof ingredient === 'string' && 
           ingredient.trim().length > 0
         )

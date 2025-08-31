@@ -36,15 +36,14 @@ export default function RecipeFeedback({ recipe, userId, onFeedbackSubmitted, on
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [existingFeedback, setExistingFeedback] = useState<any>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [existingFeedback, setExistingFeedback] = useState<FeedbackData | null>(null);
 
   // Check for existing feedback
   useEffect(() => {
     const checkExistingFeedback = async () => {
       try {
         const response = await fetch(`/api/feedback?userId=${userId}&recipeId=${recipe.id}`);
-        const data = await response.json();
+        const data: { success: boolean; feedback: FeedbackData[] } = await response.json();
         
         if (data.success && data.feedback.length > 0) {
           const existing = data.feedback[0];
@@ -73,7 +72,7 @@ export default function RecipeFeedback({ recipe, userId, onFeedbackSubmitted, on
     setFeedback(prev => ({ ...prev, rating }));
   };
 
-  const handleInputChange = (field: keyof FeedbackData, value: any) => {
+  const handleInputChange = (field: keyof FeedbackData, value: string | number | boolean) => {
     setFeedback(prev => ({ ...prev, [field]: value }));
   };
 
@@ -109,7 +108,7 @@ export default function RecipeFeedback({ recipe, userId, onFeedbackSubmitted, on
         }),
       });
 
-      const data = await response.json();
+      const data: { success: boolean; error?: string } = await response.json();
 
       if (data.success) {
         alert(existingFeedback ? 'Feedback updated successfully!' : 'Feedback submitted successfully!');

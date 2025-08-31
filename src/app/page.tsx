@@ -7,6 +7,18 @@ import PersonalizedRecommendations from '../components/PersonalizedRecommendatio
 import ImageRecipeGenerator from '../components/ImageRecipeGenerator';
 import { UserInputForm } from '../types/recipe';
 
+interface Recipe {
+  recipeId: string;
+  name: string;
+  description?: string;
+  ingredients: string[];
+  instructions?: string[];
+  dietaryPreferences?: string[];
+  cuisineType?: string;
+  cookingTime?: number;
+  servings?: number;
+}
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<UserInputForm | null>(null);
@@ -14,7 +26,7 @@ export default function Home() {
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showImageGenerator, setShowImageGenerator] = useState(false);
   const [userId, setUserId] = useState<string>('');
-  const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   // Generate or retrieve user ID on component mount
   useEffect(() => {
@@ -31,7 +43,7 @@ export default function Home() {
   const handleFormSubmit = async (data: UserInputForm) => {
     setIsLoading(true);
     setFormData(data);
-    
+
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       console.log('Form submitted with data:', data);
@@ -63,7 +75,7 @@ export default function Home() {
     setShowRecommendations(false);
   };
 
-  const handleRecipeSelect = (recipe: any) => {
+  const handleRecipeSelect = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
   };
 

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { UserInputForm, FormValidation } from '../types/recipe';
+import { UserInputForm } from '../types/recipe';
 import { validateIngredientForm, sanitizeIngredient, isDuplicateIngredient } from '../utils/formValidation';
 
 export const useIngredientForm = () => {
@@ -21,7 +21,7 @@ export const useIngredientForm = () => {
   // Add ingredient to the list
   const addIngredient = useCallback((ingredient: string) => {
     const sanitized = sanitizeIngredient(ingredient);
-    
+
     if (!sanitized || sanitized.length === 0) {
       return { success: false, error: 'Please enter a valid ingredient name' };
     }
@@ -69,7 +69,7 @@ export const useIngredientForm = () => {
   }, []);
 
   // Update form field
-  const updateField = useCallback((field: keyof UserInputForm, value: any) => {
+  const updateField = useCallback((field: keyof UserInputForm, value: string | number | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setTouched(prev => new Set([...prev, field]));
   }, []);
@@ -91,11 +91,11 @@ export const useIngredientForm = () => {
   // Check if field has been touched and has errors
   const getFieldError = useCallback((field: string): string | null => {
     if (!touched.has(field)) return null;
-    
-    const fieldErrors = validation.errors.filter(error => 
+
+    const fieldErrors = validation.errors.filter(error =>
       error.toLowerCase().includes(field.toLowerCase())
     );
-    
+
     return fieldErrors.length > 0 ? fieldErrors[0] : null;
   }, [touched, validation.errors]);
 
@@ -110,20 +110,20 @@ export const useIngredientForm = () => {
     searchTerm,
     validation,
     canSubmit,
-    
+
     // Actions
     addIngredient,
     removeIngredient,
     toggleDietaryPreference,
     updateField,
     resetForm,
-    
+
     // Setters
     setCustomIngredient,
     setSearchTerm,
-    
+
     // Utilities
     getFieldError,
     touched
   };
-}; 
+};
