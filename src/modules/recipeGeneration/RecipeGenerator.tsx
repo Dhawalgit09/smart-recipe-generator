@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { Recipe } from '../../types/recipe';
-import { useRecipeMatching } from '../../hooks/useRecipeMatching';
+import { useState, useCallback, useMemo } from 'react';
+import { Recipe } from '../../types/recipe';  // Remove RecipeMatch, IngredientMatch imports
+import { useRecipeMatching } from '../../hooks/useRecipeMatching';  // Remove RecipeMatchingAlgorithm import
 import RecipeCard from './RecipeCard';
 import RecipeFilters from './RecipeFilters';
 import RecipeDetails from './RecipeDetails';

@@ -14,11 +14,11 @@ export default function RecipeCard({ recipe, index, onSelect, userIngredients }:
   const { recipe: recipeData, matchScore, ingredientMatches } = recipe;
   
   // Calculate ingredient match statistics
-  const exactMatches = ingredientMatches.filter(m => m.matchType === 'exact').length;
+  const exactMatchesCount = ingredientMatches.filter(m => m.matchType === 'exact').length;
   const similarMatches = ingredientMatches.filter(m => m.matchType === 'similar').length;
   const substituteMatches = ingredientMatches.filter(m => m.matchType === 'substitute').length;
   // Calculate missing ingredients (used for display purposes)
-  const missingIngredientsCount = ingredientMatches.filter(m => m.matchType === 'missing').length;
+  const missingIngredients = ingredientMatches.filter(m => m.matchType === 'missing').length;
   
   // Calculate match percentage
   const matchPercentage = Math.round(matchScore * 100);
@@ -135,7 +135,7 @@ export default function RecipeCard({ recipe, index, onSelect, userIngredients }:
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            <span className="text-gray-300">{exactMatches} exact</span>
+            <span className="text-gray-300">{exactMatchesCount} exact</span>
           </div>
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>

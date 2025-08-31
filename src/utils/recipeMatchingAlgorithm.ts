@@ -148,7 +148,7 @@ export class RecipeMatchingAlgorithm {
     const similarMatches = matches.filter(m => m.matchType === 'similar').length;
     const substituteMatches = matches.filter(m => m.matchType === 'substitute').length;
     // Count of missing ingredients (not used in score calculation but useful for debugging)
-    const missingIngredientsCount = matches.filter(m => m.matchType === 'missing').length;
+    const missingIngredients = matches.filter(m => m.matchType === 'missing').length;
 
     // Calculate score with different weights for different match types
     const score = (

@@ -63,7 +63,8 @@ export default function RecipeDetails({ recipe, userIngredients, onClose, userId
     };
   });
 
-  const exactMatches = ingredientMatches.filter(m => m.matchType === 'exact');
+  // Count of exact matches (used for display purposes)
+  const exactMatchesCount = ingredientMatches.filter(m => m.matchType === 'exact').length;
   // Get missing ingredients for display purposes
   const missingIngredientsForDisplay = recipe.ingredients.filter(ing => 
     !userIngredients.some(userIng => 
